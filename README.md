@@ -1,61 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Observatório - Guia de Instalação
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este é um projeto Laravel 12 com TailwindCSS e Vite. Siga este guia para configurar o projeto em um PC zerado.
 
-## About Laravel
+## Pré-requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Antes de começar, certifique-se de ter os seguintes softwares instalados:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. PHP 8.2 ou superior
+- **Windows**: Baixe do [site oficial do PHP](https://www.php.net/downloads.php) ou use [XAMPP](https://www.apachefriends.org/pt_br/index.html)/[Laragon](https://laragon.org/)
+- **macOS**: Use Homebrew: `brew install php`
+- **Linux**: `sudo apt install php8.2 php8.2-cli php8.2-common php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Composer
+Baixe e instale o [Composer](https://getcomposer.org/download/) (gerenciador de dependências PHP)
 
-## Learning Laravel
+### 3. Node.js e npm
+- Baixe e instale do [site oficial do Node.js](https://nodejs.org/) (versão LTS recomendada)
+- Ou use o gerenciador de versões [nvm](https://github.com/nvm-sh/nvm)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 4. Git
+- **Windows**: [Git for Windows](https://gitforwindows.org/)
+- **macOS**: `brew install git`
+- **Linux**: `sudo apt install git`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Instalação
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone o repositório
+```bash
+git clone <url-do-repositorio>
+cd observatorio
+```
 
-## Laravel Sponsors
+### 2. Instale as dependências PHP
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Instale as dependências JavaScript
+```bash
+npm install
+```
 
-### Premium Partners
+### 4. Configure o arquivo de ambiente
+```bash
+# Copie o arquivo de exemplo (se existir) ou crie um novo
+cp .env.example .env
+# ou se não existir o .env.example:
+php artisan env:create
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 5. Gere a chave da aplicação
+```bash
+php artisan key:generate
+```
 
-## Contributing
+### 7. Execute as migrações
+```bash
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 9. Crie o link simbólico para o storage
+```bash
+php artisan storage:link
+```
 
-## Code of Conduct
+## Executando o projeto
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Modo de desenvolvimento
+Para executar o projeto em modo de desenvolvimento com hot reload:
 
-## Security Vulnerabilities
+```bash
+# Inicia o servidor Laravel, queue worker, logs e Vite simultaneamente
+composer run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
