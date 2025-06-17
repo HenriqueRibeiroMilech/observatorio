@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Dashboard Profissional</title>
+    <title>Dashboard Observatório</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -57,27 +57,201 @@
                 </div>
             </div>
 
+            @if(isset($graficos['faixaEtaria']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Distribuição por Faixa Etária</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['faixaEtaria']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['formacaoEscolar']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Distribuição por Formação Escolar</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['formacaoEscolar']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['rendaPessoal']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Distribuição por Renda Pessoal</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['rendaPessoal']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['profissoes']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Distribuição por Profissão</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['profissoes']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Gráfico de Estados -->
-            @if(isset($graficos['estados']))
+            @if(isset($graficos['estadosBarra']))
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Estados de Origem</h3>
                 </div>
                 <div class="p-6">
                     <div style="height: 550px;">
-                        {!! $graficos['estados']->container() !!}
+                        {!! $graficos['estadosBarra']->container() !!}
                     </div>
                 </div>
             </div>
             @endif
+
+            @if(isset($graficos['estadosPizza']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Estados de Origem</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['estadosPizza']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['paisBarra']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">País de Residência</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['paisBarra']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['paisPizza']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">País de Residência</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['paisPizza']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['municipios']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Município de Residência</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['municipios']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['conhecimentoPrevio']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Conhecimento Prévio do Destino</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['conhecimentoPrevio']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['fontesReferencia']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Fontes de Referência (Menções Múltiplas)</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['fontesReferencia']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+
         </div>
         @endif
     </div>
 
     @if(!isset($erro))
     {!! $graficos['genero']->script() !!}
-    @if(isset($graficos['estados']))
-    {!! $graficos['estados']->script() !!}
+
+    @if(isset($graficos['faixaEtaria']))
+    {!! $graficos['faixaEtaria']->script() !!}
+
+    @if(isset($graficos['formacaoEscolar']))
+    {!! $graficos['formacaoEscolar']->script() !!}
+
+    @if(isset($graficos['rendaPessoal']))
+    {!! $graficos['rendaPessoal']->script() !!}
+
+    @if(isset($graficos['profissoes']))
+    {!! $graficos['profissoes']->script() !!}
+
+    @if(isset($graficos['estadosBarra']))
+    {!! $graficos['estadosBarra']->script() !!}
+
+    @if(isset($graficos['estadosPizza']))
+    {!! $graficos['estadosPizza']->script() !!}
+
+    @if(isset($graficos['paisPizza']))
+    {!! $graficos['paisPizza']->script() !!}
+
+    @if(isset($graficos['paisBarra']))
+    {!! $graficos['paisBarra']->script() !!}
+
+    @if(isset($graficos['municipios']))
+    {!! $graficos['municipios']->script() !!}
+
+    @if(isset($graficos['conhecimentoPrevio']))
+    {!! $graficos['conhecimentoPrevio']->script() !!}
+
+    @if(isset($graficos['fontesReferencia']))
+    {!! $graficos['fontesReferencia']->script() !!}
+
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
+    @endif
     @endif
     @endif
 
