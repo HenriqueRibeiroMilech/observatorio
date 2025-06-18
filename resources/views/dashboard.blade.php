@@ -201,58 +201,129 @@
             </div>
             @endif
 
+            @if(isset($graficos['interesses']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Interesses nesta viagem (Menções Múltiplas)</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['interesses']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
 
+            @if(isset($graficos['acesso']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Acesso ao Destino (Menções Múltiplas)</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['acesso']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['transporteDestino']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Transporte no Destino (Menções Múltiplas)</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['transporteDestino']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['nota']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Nota Geral</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['nota']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+
+            
         </div>
         @endif
     </div>
 
     @if(!isset($erro))
+    @if(isset($graficos['faixaEtaria']))
     {!! $graficos['genero']->script() !!}
+    @endif
 
     @if(isset($graficos['faixaEtaria']))
     {!! $graficos['faixaEtaria']->script() !!}
+    @endif
 
     @if(isset($graficos['formacaoEscolar']))
     {!! $graficos['formacaoEscolar']->script() !!}
+    @endif
 
     @if(isset($graficos['rendaPessoal']))
     {!! $graficos['rendaPessoal']->script() !!}
+    @endif
 
     @if(isset($graficos['profissoes']))
     {!! $graficos['profissoes']->script() !!}
+    @endif
 
     @if(isset($graficos['estadosBarra']))
     {!! $graficos['estadosBarra']->script() !!}
-
+    @endif
+    
     @if(isset($graficos['estadosPizza']))
     {!! $graficos['estadosPizza']->script() !!}
+    @endif
 
     @if(isset($graficos['paisPizza']))
     {!! $graficos['paisPizza']->script() !!}
-
+    @endif
+    
     @if(isset($graficos['paisBarra']))
     {!! $graficos['paisBarra']->script() !!}
-
+    @endif
+    
     @if(isset($graficos['municipios']))
     {!! $graficos['municipios']->script() !!}
+    @endif
 
     @if(isset($graficos['conhecimentoPrevio']))
     {!! $graficos['conhecimentoPrevio']->script() !!}
+    @endif
 
     @if(isset($graficos['fontesReferencia']))
     {!! $graficos['fontesReferencia']->script() !!}
+    @endif
+    
+    @if(isset($graficos['interesses']))
+    {!! $graficos['interesses']->script() !!}
+    @endif
 
+    @if(isset($graficos['acesso']))
+    {!! $graficos['acesso']->script() !!}
     @endif
+
+    @if(isset($graficos['transporteDestino']))
+    {!! $graficos['transporteDestino']->script() !!}
     @endif
+
+    @if(isset($graficos['nota']))
+    {!! $graficos['nota']->script() !!}
     @endif
-    @endif
-    @endif
-    @endif
-    @endif
-    @endif
-    @endif
-    @endif
-    @endif
+
     @endif
 
     <script>

@@ -43,16 +43,22 @@ class DashboardController extends Controller
             'formacaoEscolar' => $this->graficoFormacaoEscolar($dados),
             'rendaPessoal' => $this->graficoRendaPessoal($dados),
             'profissoes' => $this->graficobarra(dados:$dados,chave:'profissao',titulo:'Contagem de Profissões', valorNulo : 'NÃO CADASTRADA'),
-            #'profissoes' => $this->graficoProfissoes($dados),
-            #'estadosBarra' => $this->graficoEstadosBarra($dados),
-            'estadosBarra' => $this->graficobarra(dados:$dados,chave:'uf_procedencia',titulo:'Estados de Origem'),
+
+            'estadosBarra' => $this->graficobarra(dados:$dados,chave:'uf_procedencia',titulo:'Visitantes por Estado', naoinformado:True),
             'estadosPizza' => $this->graficoEstadoPizza($dados),
             'paisPizza' => $this->graficoPaisPizza($dados),
-            'paisBarra' => $this->graficoPaisBarra($dados),
-            'municipios' => $this->graficoMunicipios($dados),
+            'paisBarra' => $this->graficobarra(dados:$dados,chave:'pais_procedencia',titulo:'Visitantes por País', naoinformado:True),
+            'municipios' => $this->graficobarra(dados:$dados,chave:'municipio_procedencia',titulo:'Visitantes por Município', naoinformado:True),
 
             'conhecimentoPrevio' => $this->graficoConhecimentoPrevio($dados),
-            'fontesReferencia' => $this->graficoFontesReferencia($dados)
+            'fontesReferencia' => $this->graficobarra(dados:$dados,chave:'fontes_informacao', separador:','),
+
+            'interesses' => $this->graficobarra(dados:$dados,chave:'interesse', separador:',', naoinformado:True),
+
+            'acesso' => $this->graficobarra(dados:$dados,chave:'transporte_acessos', separador:',', naoinformado:True),
+            'transporteDestino' => $this->graficobarra(dados:$dados,chave:'transporte_destinos', separador:',', naoinformado:True),
+
+            'nota' => $this->graficobarra(dados:$dados,chave:'nota_geral', naoinformado:True) #MUDAR PARA PEGAR EM ORDEM E NÃO PEGAR OS NÃO INFORMADO
         ];
     }
     
@@ -60,11 +66,15 @@ class DashboardController extends Controller
 
     }
 
-    private function graficobarra($dados, $chave, $titulo = 'Gráfico', $cor = ['#9966FF'], $valorNulo = 'Não informado', $separador = null, $limite = 15){
+    private function graficobarra($dados, $chave, $titulo = '', $cor = ['#9966FF'], $valorNulo = 'Não informado', $separador = null, $limite = 15, $naoinformado = False){
         $contagem = [];
 
         foreach ($dados as $registro) {
             $valorBruto = $registro[$chave] ?? $valorNulo;
+
+            if ($naoinformado && (is_null($valorBruto) || trim($valorBruto) === '')) {
+                continue;
+            }
 
             if (empty($valorBruto)) {
                 $contagem[$valorNulo] = ($contagem[$valorNulo] ?? 0) + 1;
@@ -273,53 +283,6 @@ class DashboardController extends Controller
         return $chart;
     }
 
-    // Gráfico barras: top 15 profissões
-    private function graficoProfissoes($dados)
-    {
-        $profissoes = [];
-        
-        // Conta cada estado
-        foreach ($dados as $registro) {
-            $profissao = trim($registro['profissao'] ?? 'NÃO CADASTRADA');
-            $profissoes[$profissao] = ($profissoes[$profissao] ?? 0) + 1;
-        }
-        
-        // Ordena e pega top 15
-        arsort($profissoes);
-        $profissoes = array_slice($profissoes, 0, 15, true);
-        
-        $chart = new Chart;
-        $chart->labels(array_keys($profissoes));
-        $chart->dataset('Contagem de profissões', 'bar', array_values($profissoes))
-              ->backgroundColor('#9966FF');
-        
-        return $chart;
-    }
-
-    // Gráfico barras: top 10 estados de origem
-    private function graficoEstadosBarra($dados)
-    {
-        $estados = [];
-        
-        // Conta cada estado
-        foreach ($dados as $registro) {
-            $uf = trim($registro['uf_procedencia'] ?? 'Não informado');
-            if (empty($uf)) $uf = 'Não informado';
-            $estados[$uf] = ($estados[$uf] ?? 0) + 1;
-        }
-        
-        // Ordena e pega top 10
-        arsort($estados);
-        $estados = array_slice($estados, 0, 10, true);
-        
-        $chart = new Chart;
-        $chart->labels(array_keys($estados));
-        $chart->dataset('Visitantes por Estado', 'bar', array_values($estados))
-              ->backgroundColor('#9966FF');
-        
-        return $chart;
-    }
-
     // Gráfico pizza: Rio Grande do Sul || Outros estados
     private function graficoEstadoPizza($dados)
     {
@@ -342,30 +305,6 @@ class DashboardController extends Controller
         $chart->dataset('Estado de Origem', 'pie', [$rs, $outro])
               ->backgroundColor(["#5ec962","#482173"]);
 
-        return $chart;
-    }
-    
-    // Gráfico barras: top 10 país de residência
-    private function graficoPaisBarra($dados)
-    {
-        $paises = [];
-        
-        // Conta cada estado
-        foreach ($dados as $registro) {
-            $pais = trim($registro['pais_procedencia'] ?? 'Não informado');
-            if (empty($pais)) $pais = 'Não informado';
-            $paises[$pais] = ($paises[$pais] ?? 0) + 1;
-        }
-        
-        // Ordena e pega top 10
-        arsort($paises);
-        $paises = array_slice($paises, 0, 10, true);
-        
-        $chart = new Chart;
-        $chart->labels(array_keys($paises));
-        $chart->dataset('Visitantes por Pais', 'bar', array_values($paises))
-              ->backgroundColor('#9966FF');
-        
         return $chart;
     }
 
@@ -439,48 +378,6 @@ class DashboardController extends Controller
 
         return $chart;
     }
-
-    // Gráfico barras: top Fontes de Referência
-    private function graficoFontesReferencia($dados)
-    {
-        $fontes = [];
-
-        foreach ($dados as $registro) {
-            $texto = $registro['fontes_informacao'] ?? 'Não informado';
-
-            if (empty($texto)) {
-                $fontes['Não informado'] = ($fontes['Não informado'] ?? 0) + 1;
-                continue;
-            }
-
-            $itens = explode(',', $texto);
-
-            foreach ($itens as $fonte) {
-                $fonteLimpa = trim($fonte);
-                if ($fonteLimpa === '') {
-                    $fonteLimpa = 'Não informado';
-                }
-                $fontes[$fonteLimpa] = ($fontes[$fonteLimpa] ?? 0) + 1;
-            }
-        }
-
-        // Ordena e pega top 15
-        arsort($fontes);
-        $topFontes = array_slice($fontes, 0, 15, true);
-
-        $chart = new Chart;
-        $chart->labels(array_keys($topFontes));
-        $chart->dataset('Fontes de Referência', 'bar', array_values($topFontes))
-            ->backgroundColor('#9966FF');
-
-        return $chart;
-    }
-
-
-
-
-
-
 
 
 
