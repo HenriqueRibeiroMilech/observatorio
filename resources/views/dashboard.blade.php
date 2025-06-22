@@ -175,6 +175,32 @@
             </div>
             @endif
 
+            @if(isset($graficos['perfilViajantes']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Perfil dos Viajantes</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['perfilViajantes']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(isset($graficos['quantidadeViajantes']))
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Quantidade de Viajantes</h3>
+                </div>
+                <div class="p-6">
+                    <div style="height: 550px;">
+                        {!! $graficos['quantidadeViajantes']->container() !!}
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @if(isset($graficos['conhecimentoPrevio']))
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -252,8 +278,7 @@
                 </div>
             </div>
             @endif
-
-
+            
             
         </div>
         @endif
@@ -298,6 +323,14 @@
     
     @if(isset($graficos['municipios']))
     {!! $graficos['municipios']->script() !!}
+    @endif
+    
+    @if(isset($graficos['perfilViajantes']))
+    {!! $graficos['perfilViajantes']->script() !!}
+    @endif
+
+    @if(isset($graficos['quantidadeViajantes']))
+    {!! $graficos['quantidadeViajantes']->script() !!}
     @endif
 
     @if(isset($graficos['conhecimentoPrevio']))

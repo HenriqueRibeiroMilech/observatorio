@@ -50,6 +50,9 @@ class DashboardController extends Controller
             'paisBarra' => $this->graficobarra(dados:$dados,chave:'pais_procedencia',titulo:'Visitantes por País', naoinformado:True),
             'municipios' => $this->graficobarra(dados:$dados,chave:'municipio_procedencia',titulo:'Visitantes por Município', naoinformado:True),
 
+            'perfilViajantes' => $this->graficoPerfilViajantes($dados),
+            'quantidadeViajantes' => $this->graficoQuantidadeViajantes($dados),
+
             'conhecimentoPrevio' => $this->graficoConhecimentoPrevio($dados),
             'fontesReferencia' => $this->graficobarra(dados:$dados,chave:'fontes_informacao', separador:','),
 
@@ -60,10 +63,6 @@ class DashboardController extends Controller
 
             'nota' => $this->graficobarra(dados:$dados,chave:'nota_geral', naoinformado:True) #MUDAR PARA PEGAR EM ORDEM E NÃO PEGAR OS NÃO INFORMADO
         ];
-    }
-    
-    private function graficopizza($dados){
-
     }
 
     private function graficobarra($dados, $chave, $titulo = '', $cor = ['#9966FF'], $valorNulo = 'Não informado', $separador = null, $limite = 15, $naoinformado = False){
@@ -379,21 +378,77 @@ class DashboardController extends Controller
         return $chart;
     }
 
+    // Gráfico de Pizza: perfil dos viajantes
+    private function graficoPerfilViajantes($dados)
+    {
+        $perfis = [];
+        
+        // Conta cada estado
+        foreach ($dados as $registro) {
+            $perfil = trim($registro['acompanhantes'] ?? 'Não informado');
+            if (empty($perfil)) $perfil = 'Não informado';
+            $perfis[$perfil] = ($perfis[$perfil] ?? 0) + 1;
+        }
+        
+        arsort($perfis);
+        
+        $chart = new Chart;
+        $chart->labels(array_keys($perfis));
+        $chart->dataset('Perfil dos Viajantes', 'pie', array_values($perfis))
+              ->backgroundColor(["#440154","#482878","#3e4989","#31688e","#26828e","#1f9e89","#35b779","#6ece58","#b5de2b","#fde725"]);
+        
+        return $chart;
+    }
 
+    // Gráfico pizza: Quantidade de pessoas na viagem
+    private function graficoQuantidadeViajantes($dados)
+    {
+        $um = 0; 
+        $dois = 0; 
+        $tresQuatro = 0;
+        $cincoDez = 0;
+        $onzeVinte = 0;
+        $maisVinte = 0;
+        
+        foreach ($dados as $registro) {
+            $qtd = intval($registro['total_pessoas_viajando'] ?? 0);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if ($qtd < 2) {
+                $um++;
+            } elseif ($qtd < 3) {
+                $dois++;
+            } elseif ($qtd < 5) {
+                $tresQuatro++;
+            } elseif ($qtd < 11) {
+                $cincoDez++;
+            } elseif ($qtd < 21) {
+                $onzeVinte++;
+            } else {
+                $maisVinte++;
+            }
+        }
+        
+        $chart = new Chart;
+            $chart->labels([
+                '1',
+                '2',
+                '3-4',
+                '5-10',
+                '11-20',
+                '20+'
+            ]);
+        $chart->dataset('Distribuição por Quantidade de pessoas', 'pie', [
+            $um,
+            $dois,
+            $tresQuatro,
+            $cincoDez,
+            $onzeVinte,
+            $maisVinte
+        ])
+              ->backgroundColor(["#440154","#414487","#2a788e","#22a884","#7ad151","#fde725"]);
+        
+        return $chart;
+    }
 
 
 
