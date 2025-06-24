@@ -38,30 +38,48 @@ class DashboardController extends Controller
     private function criarGraficos($dados)
     {
         return [
+            // PERFIL DO VISITANTE
             'genero' => $this->graficoGenero($dados),
             'faixaEtaria' => $this->graficoFaixaEtaria($dados),
             'formacaoEscolar' => $this->graficoFormacaoEscolar($dados),
             'rendaPessoal' => $this->graficoRendaPessoal($dados),
             'profissoes' => $this->graficobarra(dados:$dados,chave:'profissao',titulo:'Contagem de Profissões', valorNulo : 'NÃO CADASTRADA'),
 
+            //ORIGEM
             'estadosBarra' => $this->graficobarra(dados:$dados,chave:'uf_procedencia',titulo:'Visitantes por Estado', naoinformado:True),
             'estadosPizza' => $this->graficoEstadoPizza($dados),
             'paisPizza' => $this->graficoPaisPizza($dados),
             'paisBarra' => $this->graficobarra(dados:$dados,chave:'pais_procedencia',titulo:'Visitantes por País', naoinformado:True),
             'municipios' => $this->graficobarra(dados:$dados,chave:'municipio_procedencia',titulo:'Visitantes por Município', naoinformado:True),
 
+            //ACOMPANHANTES:
             'perfilViajantes' => $this->graficoPerfilViajantes($dados),
             'quantidadeViajantes' => $this->graficoQuantidadeViajantes($dados),
 
+            //CONHECIMENTO PRÉVIO DO DESTINO
             'conhecimentoPrevio' => $this->graficoConhecimentoPrevio($dados),
             'fontesReferencia' => $this->graficobarra(dados:$dados,chave:'fontes_informacao', separador:','),
 
+            //MOTIVAÇÃO E INTERESSES:
             'interesses' => $this->graficobarra(dados:$dados,chave:'interesse', separador:',', naoinformado:True),
+            'motivacao' => $this->graficoMotivacao($dados),
 
+            //DURAÇÃO DA VIAGEM (EM DIAS)
+            'duracaoViagem' => $this->graficoDuracaoViagem($dados),
+
+            //GASTO DIÁRIO POR PESSOA:
+            'gastoDiarioPorPessoa' => $this->graficoGastoDiarioPorPessoa($dados),
+
+            //TRANSPORTE:
             'acesso' => $this->graficobarra(dados:$dados,chave:'transporte_acessos', separador:',', naoinformado:True),
             'transporteDestino' => $this->graficobarra(dados:$dados,chave:'transporte_destinos', separador:',', naoinformado:True),
 
-            'nota' => $this->graficobarra(dados:$dados,chave:'nota_geral', naoinformado:True) #MUDAR PARA PEGAR EM ORDEM E NÃO PEGAR OS NÃO INFORMADO
+            //ORGANIZAÇÃO DA VIAGEM
+            'organizacaoViagem' => $this->graficoOrganizacaoViagem($dados),
+            'outrosOrganizadores' => $this->graficoOutrosOrganizadores($dados),
+
+            //NÍVEL DE SATISFAÇÃO GERAL COM O DESTINO:
+            'nota' => $this->graficoNotaGeral($dados)
         ];
     }
 
@@ -450,16 +468,226 @@ class DashboardController extends Controller
         return $chart;
     }
 
+    // Gráfico pizza: Organização da Viagem (Viajante vs Outros)
+    private function graficoOrganizacaoViagem($dados)
+    {
+        $viajante = 0; 
+        $outros = 0;
 
+        foreach ($dados as $registro) {
+            $organizacao = strtoupper(trim($registro['organizacao_viagem'] ?? ''));
 
+            if ($organizacao === 'PROPRIA') {
+                $viajante++;
+            } else {
+                $outros++;
+            }
+        }
+        
+        $chart = new Chart;
+        $chart->labels(['Viajante', 'Outros']);
+        $chart->dataset('Organização da Viagem', 'pie', [$viajante, $outros])
+              ->backgroundColor(["#36A2EB","#FF6384"]);
 
+        return $chart;
+    }
 
+    // Gráfico pizza: Outros Organizadores (Quando citados) - exclui PROPRIA e não informados
+    private function graficoOutrosOrganizadores($dados)
+    {
+        $organizadores = [];
+        
+        foreach ($dados as $registro) {
+            $organizacao = trim($registro['organizacao_viagem'] ?? '');
+            
+            // Pula se for PROPRIA ou vazio/não informado
+            if (empty($organizacao) || strtoupper($organizacao) === 'PROPRIA') {
+                continue;
+            }
+            
+            $organizadores[$organizacao] = ($organizadores[$organizacao] ?? 0) + 1;
+        }
+        
+        arsort($organizadores);
+        
+        $chart = new Chart;
+        $chart->labels(array_keys($organizadores));
+        $chart->dataset('Outros Organizadores (Quando citados)', 'pie', array_values($organizadores))
+              ->backgroundColor(["#440154","#482878","#3e4989","#31688e","#26828e","#1f9e89","#35b779","#6ece58","#b5de2b","#fde725"]);
+        
+        return $chart;
+    }
 
+    // Gráfico pizza: Duração da viagem (Em dias)
+    private function graficoDuracaoViagem($dados)
+    {
+        $umDia = 0;
+        $doisTres = 0; 
+        $quatroSete = 0;
+        $oitoQuinze = 0;
+        $dezesseisTrinta = 0;
+        $maisTrinta = 0;
+        
+        foreach ($dados as $registro) {
+            $dataInicio = $registro['data_inicio_viagem'] ?? null;
+            $dataFim = $registro['data_fim_viagem'] ?? null;
+            
+            // Verifica se as datas são válidas e não são valores padrão
+            if (empty($dataInicio) || empty($dataFim) || 
+                $dataInicio === '1970-01-01' || $dataFim === '1970-01-01' ||
+                $dataInicio === null || $dataFim === null) {
+                continue;
+            }
+            
+            try {
+                $inicio = new \DateTime($dataInicio);
+                $fim = new \DateTime($dataFim);
+                
+                // Verifica se a data de fim é posterior à data de início
+                if ($fim <= $inicio) {
+                    continue;
+                }
+                
+                $diferenca = $inicio->diff($fim);
+                $dias = $diferenca->days;
+                
+                if ($dias == 1) {
+                    $umDia++;
+                } elseif ($dias >= 2 && $dias <= 3) {
+                    $doisTres++;
+                } elseif ($dias >= 4 && $dias <= 7) {
+                    $quatroSete++;
+                } elseif ($dias >= 8 && $dias <= 15) {
+                    $oitoQuinze++;
+                } elseif ($dias >= 16 && $dias <= 30) {
+                    $dezesseisTrinta++;
+                } else {
+                    $maisTrinta++;
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+        
+        $chart = new Chart;
+        $chart->labels(['1 dia', '2-3 dias', '4-7 dias', '8-15 dias', '16-30 dias', 'Mais de 30 dias']);
+        $chart->dataset('Duração da viagem (Em dias)', 'pie', [$umDia, $doisTres, $quatroSete, $oitoQuinze, $dezesseisTrinta, $maisTrinta])
+              ->backgroundColor(["#440154","#482575","#414487","#355f8d","#2a788e","#21918c"]);
+        
+        return $chart;
+    }
 
+    // Gráfico pizza: Motivação Principal - exclui valores null
+    private function graficoMotivacao($dados)
+    {
+        $motivacoes = [];
+        
+        foreach ($dados as $registro) {
+            $motivacao = trim($registro['motivacao'] ?? '');
+            
+            // Pula se for null ou vazio
+            if (empty($motivacao) || $motivacao === null) {
+                continue;
+            }
+            
+            $motivacoes[$motivacao] = ($motivacoes[$motivacao] ?? 0) + 1;
+        }
+        
+        arsort($motivacoes);
+        
+        $chart = new Chart;
+        $chart->labels(array_keys($motivacoes));
+        $chart->dataset('Motivação Principal', 'pie', array_values($motivacoes))
+              ->backgroundColor(["#440154","#482878","#3e4989","#31688e","#26828e","#1f9e89","#35b779","#6ece58","#b5de2b","#fde725"]);
+        
+        return $chart;
+    }
 
+    // Gráfico pizza: Gasto Diário por Pessoa
+    private function graficoGastoDiarioPorPessoa($dados)
+    {
+        $ate250 = 0;
+        $de250a500 = 0;
+        $de500a750 = 0;
+        $de750a1000 = 0;
+        $de1000a2000 = 0;
+        $acima2000 = 0;
+        
+        foreach ($dados as $registro) {
+            $gastoDiario = floatval($registro['gasto_diario'] ?? 0);
+            $totalPessoas = intval($registro['total_pessoas_gasto_diario'] ?? 0);
+            
+            // Pula se não há dados válidos de gasto ou pessoas
+            if ($gastoDiario <= 0 || $totalPessoas <= 0) {
+                continue;
+            }
+            
+            // Calcula gasto por pessoa
+            $gastoPorPessoa = $gastoDiario / $totalPessoas;
+            
+            // Classifica nas faixas
+            if ($gastoPorPessoa <= 250) {
+                $ate250++;
+            } elseif ($gastoPorPessoa <= 500) {
+                $de250a500++;
+            } elseif ($gastoPorPessoa <= 750) {
+                $de500a750++;
+            } elseif ($gastoPorPessoa <= 1000) {
+                $de750a1000++;
+            } elseif ($gastoPorPessoa <= 2000) {
+                $de1000a2000++;
+            } else {
+                $acima2000++;
+            }
+        }
+        
+        $chart = new Chart;
+        $chart->labels([
+            'Até R$ 250,00',
+            'R$ 250,01 - 500,00',
+            'R$ 500,01 - 750,00',
+            'R$ 750,01 - 1.000,00',
+            'R$ 1.000,01 - 2.000,00',
+            'R$ 2.000,00 OU +'
+        ]);
+        $chart->dataset('Gasto Diário por Pessoa', 'pie', [$ate250, $de250a500, $de500a750, $de750a1000, $de1000a2000, $acima2000])
+              ->backgroundColor(["#4CAF50","#8BC34A","#CDDC39","#FFC107","#FF9800","#F44336"]);
+        
+        return $chart;
+    }
 
-
-
+    // Gráfico barras: Nota Geral - ordenado por valor decrescente, sem não informados
+    private function graficoNotaGeral($dados)
+    {
+        // Inicializa todas as notas de 10 a 0 com valor 0
+        $notas = [];
+        for ($i = 10; $i >= 0; $i--) {
+            $notas[strval($i)] = 0;
+        }
+        
+        foreach ($dados as $registro) {
+            $nota = $registro['nota_geral'] ?? null;
+            
+            // Pula se for null, vazio ou não numérico
+            if (is_null($nota) || $nota === '' || !is_numeric($nota)) {
+                continue;
+            }
+            
+            $nota = strval($nota); // Converte para string para usar como chave
+            
+            // Só conta se a nota estiver entre 0 e 10
+            if (isset($notas[$nota])) {
+                $notas[$nota]++;
+            }
+        }
+        
+        $chart = new Chart;
+        $chart->labels(array_keys($notas));
+        $chart->dataset('Nota Geral', 'bar', array_values($notas))
+              ->backgroundColor('#9966FF');
+        
+        return $chart;
+    }
 
     // Retorna dados da API em JSON para debug
     public function verDados($id)
